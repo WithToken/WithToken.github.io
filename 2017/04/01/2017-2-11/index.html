@@ -87,16 +87,16 @@
 
 
 
-<meta name="description" content="阅读Masonry源码">
+<meta name="description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Masonry 源码阅读">
 <meta property="og:url" content="http://yoursite.com/2017/04/01/2017-2-11/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
-<meta property="og:description" content="阅读Masonry源码">
-<meta property="og:updated_time" content="2017-04-01T14:06:25.000Z">
+<meta property="og:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
+<meta property="og:updated_time" content="2017-04-01T14:16:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Masonry 源码阅读">
-<meta name="twitter:description" content="阅读Masonry源码">
+<meta name="twitter:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
 
 
 
@@ -320,10 +320,6 @@
           
 
           
-              <div class="post-description">
-                  阅读Masonry源码
-              </div>
-          
 
         </div>
       </header>
@@ -336,7 +332,9 @@
       
 
       
-        <p>#（一）首先看下<code>Masonry</code>工具的结构及各个类的大概的作用。</p>
+        <p><a href="https://github.com/SnapKit/Masonry" target="_blank" rel="external">Masonry</a>是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。</p>
+<a id="more"></a>
+<p>#（一）首先看下<code>Masonry</code>工具的结构及各个类的大概的作用。</p>
 <p>##1. <code>MASViewAttribute</code> 先看下类结构。</p>
 <p> 有三个属性和三个方法。下面是初始化方法的调用顺序。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute &#123;</div><div class="line">    self = [self initWithView:view item:view layoutAttribute:layoutAttribute];</div><div class="line">    return self;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute &#123;</div><div class="line">    self = [super init];</div><div class="line">    if (!self) return nil;</div><div class="line">    </div><div class="line">    _view = view;</div><div class="line">    _item = item;</div><div class="line">    _layoutAttribute = layoutAttribute;</div><div class="line">    </div><div class="line">    return self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
