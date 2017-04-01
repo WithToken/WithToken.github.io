@@ -71,6 +71,8 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="iOS," />
+
 
 
 
@@ -85,25 +87,16 @@
 
 
 
-<meta name="description" content="#（一）首先看下Masonry工具的结构及各个类的大概的作用。
-##1. MASViewAttribute 先看下类结构。
- 有三个属性和三个方法。下面是初始化方法的调用顺序。
-123456789101112131415- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute &amp;#1">
+<meta name="description" content="阅读Masonry源码">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Masonry 源码阅读">
 <meta property="og:url" content="http://yoursite.com/2017/04/01/2017-2-11/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
-<meta property="og:description" content="#（一）首先看下Masonry工具的结构及各个类的大概的作用。
-##1. MASViewAttribute 先看下类结构。
- 有三个属性和三个方法。下面是初始化方法的调用顺序。
-123456789101112131415- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute &amp;#1">
-<meta property="og:updated_time" content="2017-04-01T13:41:09.000Z">
+<meta property="og:description" content="阅读Masonry源码">
+<meta property="og:updated_time" content="2017-04-01T14:06:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Masonry 源码阅读">
-<meta name="twitter:description" content="#（一）首先看下Masonry工具的结构及各个类的大概的作用。
-##1. MASViewAttribute 先看下类结构。
- 有三个属性和三个方法。下面是初始化方法的调用顺序。
-123456789101112131415- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute &amp;#1">
+<meta name="twitter:description" content="阅读Masonry源码">
 
 
 
@@ -327,6 +320,10 @@
           
 
           
+              <div class="post-description">
+                  阅读Masonry源码
+              </div>
+          
 
         </div>
       </header>
@@ -339,40 +336,40 @@
       
 
       
-        <p>#（一）首先看下Masonry工具的结构及各个类的大概的作用。</p>
-<p>##1. MASViewAttribute 先看下类结构。</p>
+        <p>#（一）首先看下<code>Masonry</code>工具的结构及各个类的大概的作用。</p>
+<p>##1. <code>MASViewAttribute</code> 先看下类结构。</p>
 <p> 有三个属性和三个方法。下面是初始化方法的调用顺序。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute &#123;</div><div class="line">    self = [self initWithView:view item:view layoutAttribute:layoutAttribute];</div><div class="line">    return self;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute &#123;</div><div class="line">    self = [super init];</div><div class="line">    if (!self) return nil;</div><div class="line">    </div><div class="line">    _view = view;</div><div class="line">    _item = item;</div><div class="line">    _layoutAttribute = layoutAttribute;</div><div class="line">    </div><div class="line">    return self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
-<li>通过传入的参数可以得知这是对NSLayoutAttribute的封装。<br>该方法传入三个值：view，item，layoutAttribute。后面会用到这几个属性。</li>
+<li>通过传入的参数可以得知这是对<code>NSLayoutAttribute</code>的封装。<br>该方法传入三个值：<code>view</code>，<code>item</code>，<code>layoutAttribute</code>。后面会用到这几个属性。</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- (BOOL)isSizeAttribute &#123;</div><div class="line">    return self.layoutAttribute == NSLayoutAttributeWidth</div><div class="line">        || self.layoutAttribute == NSLayoutAttributeHeight;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
-<li>isSizeAttribute方法，该方法用来判断MASViewAttribute类中的layoutAttribute属性是否是NSLayoutAttributeWidth或者NSLayoutAttributeHeight，如果是Width或者Height的话，那么约束就添加到当前View上，而不是添加在父视图上。</li>
+<li><code>isSizeAttribute</code>方法，该方法用来判断<code>MASViewAttribute</code>类中的<code>layoutAttribute</code>属性是否是<code>NSLayoutAttributeWidth</code>或者<code>NSLayoutAttributeHeight</code>，如果是<code>Width</code>或者<code>Height</code>的话，那么约束就添加到当前View上，而不是添加在父视图上。</li>
 </ul>
-<p>##2.MASCompositeConstraint 是MASConstraint的集合</p>
+<p>##2.<code>MASCompositeConstraint</code> 是<code>MASConstraint</code>的集合</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">_childConstraints = [children mutableCopy];</div><div class="line">    for (MASConstraint *constraint in _childConstraints) &#123;</div><div class="line">        constraint.delegate = self;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 <ul>
-<li>这段可以表示：MASCompositeConstraint是存放MASConstraint对象的一个集合也就是_childConstraints这个数组。</li>
+<li>这段可以表示：<code>MASCompositeConstraint</code>是存放<code>MASConstraint</code>对象的一个集合也就是<code>_childConstraints</code>这个数组。</li>
 </ul>
-<p>##3.MASConstraint 是MASCompositeConstraint和MASViewConstraint的父类。<br> MASConstraint是一个抽象类，抽象类是什么？抽象类就是不能进行实例化的类，即没有具体实例对象的类。抽象类有点类似“模板”的作用，目的是根据其格式来创建和修改新的类。对象不能由抽象类直接创建，只可以通过抽象类派生出新的子类，再由其子类来创建对象。我们平时在进行开发的时候一般是用Protocol来达到我们想要的效果。</p>
-<p>要了解抽象类可以看看CAAnimation ，CAAnimation是一个典型的抽象类。实现都是通过其子类来实现。 回到正题，MASConstraint到底是干嘛的？其实我们就看看它的子类。MASCompositeConstraint和MASViewConstraint。</p>
-<p>##4.MASViewConstraint。对MASViewAttribute再次封装<br>  来看下他的初始化方法。就应该知道是干嘛的了。</p>
+<p>##3.<code>MASConstraint</code>是<code>MASCompositeConstraint</code>和<code>MASViewConstraint</code>的父类。<br> <code>MASConstraint</code>是一个抽象类，抽象类是什么？抽象类就是不能进行实例化的类，即没有具体实例对象的类。抽象类有点类似“模板”的作用，目的是根据其格式来创建和修改新的类。对象不能由抽象类直接创建，只可以通过抽象类派生出新的子类，再由其子类来创建对象。我们平时在进行开发的时候一般是用<code>Protocol</code>来达到我们想要的效果。</p>
+<p>要了解抽象类可以看看<code>CAAnimation</code>，<code>CAAnimation</code>是一个典型的抽象类。实现都是通过其子类来实现。 回到正题，<code>MASConstraint</code>到底是干嘛的？其实我们就看看它的子类。<code>MASCompositeConstraint</code>和<code>MASViewConstraint</code>。</p>
+<p>##4.<code>MASViewConstraint</code>。对<code>MASViewAttribute</code>再次封装<br>  来看下他的初始化方法。就应该知道是干嘛的了。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">  - (id)initWithFirstViewAttribute:(MASViewAttribute *)firstViewAttribute &#123;</div><div class="line">    self = [super init];</div><div class="line">    if (!self) return nil;</div><div class="line">    </div><div class="line">    _firstViewAttribute = firstViewAttribute;</div><div class="line">    self.layoutPriority = MASLayoutPriorityRequired;</div><div class="line">    self.layoutMultiplier = 1;</div><div class="line">    </div><div class="line">    return self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
-<li>这个初始化方法就传入了一个MASViewAttribute对象。然后保存了下来，后面会用到这个对象。</li>
-<li>并且把约束加到所在view上时候，也都是通过MASViewConstraint.m中的<strong>-(void)<install></install></strong>这个方法中。后面我们举例的时候也会看到这个方法。</li>
+<li>这个初始化方法就传入了一个<code>MASViewAttribute</code>对象。然后保存了下来，后面会用到这个对象。</li>
+<li>并且把约束加到所在<code>view</code>上时候，也都是通过<code>MASViewConstraint.m</code>中的<strong>-(void)<install></install></strong>这个方法中。后面我们举例的时候也会看到这个方法。</li>
 </ul>
-<p>##2. MASConstraintMaker<br>一个工厂类，用来创建不同类型的<strong>MASConstraint</strong>。主要就是提<br>供方法用来对view添加约束。在我们在对view进行约束的时候，往往是用这种方法来添加约束的。</p>
+<p>##2. MASConstraintMaker<br>一个工厂类，用来创建不同类型的<strong>MASConstraint</strong>。主要就是提<br>供方法用来对<code>view</code>添加约束。在我们在对<code>view</code>进行约束的时候，往往是用这种方法来添加约束的。</p>
 <pre><code>[backGroundImage mas_makeConstraints:^(MASConstraintMaker *make) {
     make.left.equalTo(@20.0f);
     make.right.equalTo(@20.0f);
 }];
 </code></pre><ul>
-<li>该Block返回的就是MASConstraintMaker类型的对象，通过该对象可以设置我们想要的约束。<strong>make.left</strong>方法就是调用<strong>MASConstraintMaker</strong>中的工厂方法：</li>
+<li>该<code>Block</code>返回的就是<code>MASConstraintMaker</code>类型的对象，通过该对象可以设置我们想要的约束。<strong>make.left</strong>方法就是调用<strong>MASConstraintMaker</strong>中的工厂方法：</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint *)left &#123;</div><div class="line">    return [self addConstraintWithLayoutAttribute:NSLayoutAttributeLeft];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>#（二）下面举个常用的添加约束的例子看看Masonry具体是怎么样进行约束的。</p>
+<p>#（二）下面举个常用的添加约束的例子看看<code>Masonry</code>具体是怎么样进行约束的。</p>
 <p>##1.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[backView mas_makeConstraints:^(MASConstraintMaker *make) &#123;</div><div class="line">    make.height.equalTo(@10.0f);</div><div class="line">    make.edges.mas_equalTo(UIEdgeInsetsMake(10.0f, 0, 10.0f, 0));</div><div class="line">    make.size.mas_equalTo(CGSizeMake(10.0, 20.0));</div><div class="line">    make.left.right.and.bottom.equalTo(superview);</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
 <ul>
 <li>只贴了几种不同情况的约束方法，并不正确。</li>
@@ -380,7 +377,7 @@
 <p>先看第一步。调用UIView的<code>category</code> <code>View+MASAdditions</code>中的</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">- (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *))block &#123;</div><div class="line">    self.translatesAutoresizingMaskIntoConstraints = NO;</div><div class="line">    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];</div><div class="line">    block(constraintMaker);</div><div class="line">    return [constraintMaker install];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
-<li>Masonry已经设置了<code>translatesAutoresizingMaskIntoConstraints</code>属性为NO,即可开始通过代码添加Constraint,否则View还是会按照以往的<code>autoresizingMask</code>进行计算.</li>
+<li><code>Masonry</code>已经设置了<code>translatesAutoresizingMaskIntoConstraints</code>属性为NO,即可开始通过代码添加<code>Constraint</code>,否则<code>View</code>还是会按照以往的<code>autoresizingMask</code>进行计算.</li>
 <li>下面创建了一个<code>MASConstraintMaker</code>对象。传入当前view，保存当前的view，因为添加约束就是需要view的嘛！</li>
 <li>通过<code>Block</code>返回<code>MASConstraintMaker</code>对象，交给用户对该对象进行配置属性。</li>
 <li>最后进行<code>install</code>操作，对刚刚创建<code>MASConstraintMaker</code>对象所传入的<code>view</code>值进行约束操作。并且返回了所有约束的数组。</li>
@@ -618,27 +615,17 @@ if (existingConstraint) {
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
 
       
         
       
 
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017/02/10/2017-2-10/" rel="next" title="first">
-                <i class="fa fa-chevron-left"></i> first
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-          </div>
-        </div>
       
 
       
@@ -726,7 +713,7 @@ ds.charset = 'UTF-8';
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -734,6 +721,13 @@ ds.charset = 'UTF-8';
 
           
 
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
