@@ -71,6 +71,8 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="iOS," />
+
 
 
 
@@ -85,25 +87,16 @@
 
 
 
-<meta name="description" content="什么是Run Loop简单介绍
-Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
-当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
-Run Lo">
+<meta name="description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="guodajiang's blog">
+<meta property="og:title" content="理解Run Loop">
 <meta property="og:url" content="http://yoursite.com/2017/04/16/2017-3-15/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
-<meta property="og:description" content="什么是Run Loop简单介绍
-Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
-当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
-Run Lo">
-<meta property="og:updated_time" content="2017-04-16T15:47:32.000Z">
+<meta property="og:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
+<meta property="og:updated_time" content="2017-04-16T15:57:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="guodajiang's blog">
-<meta name="twitter:description" content="什么是Run Loop简单介绍
-Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
-当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
-Run Lo">
+<meta name="twitter:title" content="理解Run Loop">
+<meta name="twitter:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
 
 
 
@@ -137,7 +130,7 @@ Run Lo">
 
 
 
-  <title>  | guodajiang's blog </title>
+  <title> 理解Run Loop | guodajiang's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -278,7 +271,7 @@ Run Lo">
             
             
               
-                
+                理解Run Loop
               
             
           </h1>
@@ -329,7 +322,9 @@ Run Lo">
       
 
       
-        <h1 id="什么是Run-Loop"><a href="#什么是Run-Loop" class="headerlink" title="什么是Run Loop"></a>什么是Run Loop</h1><h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><ul>
+        <p>理解Run Loop概念、数据结构解释、实例运用、总结心得。</p>
+<a id="more"></a>
+<h1 id="什么是Run-Loop"><a href="#什么是Run-Loop" class="headerlink" title="什么是Run Loop"></a>什么是Run Loop</h1><h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><ul>
 <li><code>Run Loop</code>的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于<code>Run Loop</code>循环中：接受消息-&gt;等待处理消息-&gt;处理消息。知道我们停止该循环，执行<code>Run Loop</code>停止方法，以销毁该线程。</li>
 <li>当执行Xcode的<code>run</code>按钮的时候，程序运行开启主线程，同时也开启了对象的<code>Run Loop</code>。此<code>Run Loop</code>默认启动，不会主动销毁。</li>
 <li><code>Run Loop</code>，最重要的作用，就是用来管理线程的。<br>当线程的<code>Run Loop</code>开启后，<code>Run Loop</code>开始管理线程：线程执行完任务后，线程进入休眠状态，并且不会退出，随时等待新的任务再次唤醒线程。知道手动停止<code>Run Loop</code>，结束线程。</li>
@@ -531,6 +526,12 @@ Run Lo">
 
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
       
 
       
