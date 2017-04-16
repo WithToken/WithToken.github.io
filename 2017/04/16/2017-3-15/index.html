@@ -85,15 +85,25 @@
 
 
 
-<meta name="description" content="好好学习，天天向上">
-<meta property="og:type" content="website">
+<meta name="description" content="什么是Run Loop简单介绍
+Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
+当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
+Run Lo">
+<meta property="og:type" content="article">
 <meta property="og:title" content="guodajiang's blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://yoursite.com/2017/04/16/2017-3-15/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
-<meta property="og:description" content="好好学习，天天向上">
+<meta property="og:description" content="什么是Run Loop简单介绍
+Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
+当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
+Run Lo">
+<meta property="og:updated_time" content="2017-04-16T15:47:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="guodajiang's blog">
-<meta name="twitter:description" content="好好学习，天天向上">
+<meta name="twitter:description" content="什么是Run Loop简单介绍
+Run Loop的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于Run Loop循环中：接受消息-&amp;gt;等待处理消息-&amp;gt;处理消息。知道我们停止该循环，执行Run Loop停止方法，以销毁该线程。
+当执行Xcode的run按钮的时候，程序运行开启主线程，同时也开启了对象的Run Loop。此Run Loop默认启动，不会主动销毁。
+Run Lo">
 
 
 
@@ -121,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/04/16/2017-3-15/"/>
 
 
 
 
 
-  <title>  - guodajiang's blog - 好好学习，天天向上 </title>
+  <title>  | guodajiang's blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -152,9 +162,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -235,9 +243,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -271,9 +279,6 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/16/2017-3-15/" itemprop="url">
-                  未命名
-                </a>
               
             
           </h1>
@@ -324,9 +329,7 @@
       
 
       
-        
-          
-            <h1 id="什么是Run-Loop"><a href="#什么是Run-Loop" class="headerlink" title="什么是Run Loop"></a>什么是Run Loop</h1><h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><ul>
+        <h1 id="什么是Run-Loop"><a href="#什么是Run-Loop" class="headerlink" title="什么是Run Loop"></a>什么是Run Loop</h1><h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><ul>
 <li><code>Run Loop</code>的目的大概也就是为了节省CPU资源，提高性能。配合线程使线程处于<code>Run Loop</code>循环中：接受消息-&gt;等待处理消息-&gt;处理消息。知道我们停止该循环，执行<code>Run Loop</code>停止方法，以销毁该线程。</li>
 <li>当执行Xcode的<code>run</code>按钮的时候，程序运行开启主线程，同时也开启了对象的<code>Run Loop</code>。此<code>Run Loop</code>默认启动，不会主动销毁。</li>
 <li><code>Run Loop</code>，最重要的作用，就是用来管理线程的。<br>当线程的<code>Run Loop</code>开启后，<code>Run Loop</code>开始管理线程：线程执行完任务后，线程进入休眠状态，并且不会退出，随时等待新的任务再次唤醒线程。知道手动停止<code>Run Loop</code>，结束线程。</li>
@@ -509,16 +512,20 @@
 </ul>
 <p>参考文章：<br><a href="http://blog.ibireme.com/2015/05/18/runloop/" target="_blank" rel="external">YY大神强大的分析</a><br><a href="http://www.jianshu.com/p/37ab0397fec7#" target="_blank" rel="external">RunLoop个人小结</a></p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
@@ -527,146 +534,38 @@
       
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/01/2017-2-11/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="guodajiang">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="guodajiang's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="guodajiang's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
         
-        
-          <h1 class="post-title" itemprop="name headline">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/04/01/2017-2-11/" rel="next" title="Masonry 源码阅读">
+                <i class="fa fa-chevron-left"></i> Masonry 源码阅读
+              </a>
             
-              
-                
-                <a class="post-title-link" href="/2017/04/01/2017-2-11/" itemprop="url">
-                  Masonry 源码阅读
-                </a>
-              
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-01T21:06:11+08:00">
-                2017-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <p><a href="https://github.com/SnapKit/Masonry">Masonry</a>是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/01/2017-2-11/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
           
           </div>
@@ -674,6 +573,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
 
         </div>
@@ -694,8 +597,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.png"
@@ -744,6 +656,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是Run-Loop"><span class="nav-number">1.</span> <span class="nav-text">什么是Run Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简单介绍"><span class="nav-number">1.1.</span> <span class="nav-text">简单介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与线程的关系"><span class="nav-number">1.2.</span> <span class="nav-text">与线程的关系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#细看Run-Loop"><span class="nav-number">2.</span> <span class="nav-text">细看Run Loop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Run-Loop结构与方法"><span class="nav-number">2.1.</span> <span class="nav-text">Run Loop结构与方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据结构"><span class="nav-number">2.1.1.</span> <span class="nav-text">数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事件源"><span class="nav-number">2.1.2.</span> <span class="nav-text">事件源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mode"><span class="nav-number">2.1.3.</span> <span class="nav-text">mode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mode管理modeItems的接口："><span class="nav-number">2.1.4.</span> <span class="nav-text">mode管理modeItems的接口：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-Loop运行接口"><span class="nav-number">2.1.5.</span> <span class="nav-text">Run Loop运行接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RunLoop内部逻辑"><span class="nav-number">2.2.</span> <span class="nav-text">RunLoop内部逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#综上所得"><span class="nav-number">2.3.</span> <span class="nav-text">综上所得</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
     </div>
@@ -843,6 +771,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
 
   
 
