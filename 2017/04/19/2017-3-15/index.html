@@ -90,10 +90,10 @@
 <meta name="description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="理解Run Loop">
-<meta property="og:url" content="http://yoursite.com/2017/04/16/2017-3-15/index.html">
+<meta property="og:url" content="http://yoursite.com/2017/04/19/2017-3-15/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
 <meta property="og:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
-<meta property="og:updated_time" content="2017-04-17T14:53:28.000Z">
+<meta property="og:updated_time" content="2017-04-19T14:37:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="理解Run Loop">
 <meta name="twitter:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
@@ -124,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/04/16/2017-3-15/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/04/19/2017-3-15/"/>
 
 
 
@@ -247,7 +247,7 @@
   
 
   <article class="post post-type-iOS " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/16/2017-3-15/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/19/2017-3-15/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="guodajiang">
@@ -286,8 +286,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-16T23:47:32+08:00">
-                2017-04-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-19T22:34:17+08:00">
+                2017-04-19
               </time>
             
 
@@ -296,6 +296,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -345,20 +367,18 @@
 <h3 id="事件源"><a href="#事件源" class="headerlink" title="事件源"></a>事件源</h3><ul>
 <li>Input Source包括：系统的<code>Mach Port</code>事件，是一种通讯事件、<br>自定义输入事件，例如：<ul>
 <li>Selector源：<code>performSelector</code>事件等等。</li>
-<li>关于使用<code>RunLoop</code>以<code>performSelector</code>为时间源的注意点（下面也讲到）：<br>我们在子线程线程使用<code>performSelector</code>方法：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_D EFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread)  onThread:[NSThread     currentThread] withObject:nil waitUntilDone:NO];</div><div class="line"></div><div class="line">&#125;);</div><div class="line"></div><div class="line">- (void)otherThread &#123;</div><div class="line">  NSLog(@&quot;me&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
+<li>关于使用<code>RunLoop</code>以<code>performSelector</code>为时间源的注意点（下面也讲到）：<br>我们在子线程线程使用<code>performSelector</code>方法：</li>
 </ul>
 </li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_D EFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread)  onThread:[NSThread     currentThread] withObject:nil waitUntilDone:NO];</div><div class="line"></div><div class="line">&#125;);</div><div class="line"></div><div class="line">- (void)otherThread &#123;</div><div class="line">  NSLog(@&quot;me&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>最后运行发现，最终并没有调用<code>otherThread</code>方法，原因是当我们执行<code>[self performSelector:@selector(otherThread)  onThread:[NSThread currentThread] withObject:nil waitUntilDone:NO];</code>其内部会创建一个 Timer 并添加到当前线程的 RunLoop 中。所以如果当前线程没有 RunLoop，则这个方法会失效。我们改成下面的样子：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread) onThread:[NSThread     currentThread] withObject:nil waitUntilDone:NO];</div><div class="line">    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];</div><div class="line">    [runLoop run];</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <ul>
 <li>基于端口的输入源：Source1。通过内置的端口相关的对象和函数，创建配置基于端口的输入源。   例如可以使用NSPort的方法把该端口添加到 RunLoop。</li>
-<li>自定义输入源，以<code>CFRunLoopSourceRef</code>创建。<ul>
+<li>自定义输入源，以<code>CFRunLoopSourceRef</code>创建。</li>
 <li>定时源（Timer）事件。</li>
 <li>启动<code>Run Loop</code>前要添加监听输入源事件或者<code>Timer Source</code>。否则运行<code>Run Loop</code>会直接返回。如下：</li>
-</ul>
-</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NSRunLoop *runLoop = [NSRunLoop currentRunLoop];</div><div class="line">[runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];</div></pre></td></tr></table></figure>
 <ul>
@@ -386,6 +406,8 @@
 </li>
 </ul>
 <p>创建方法：<code>CFRunLoopSourceRef source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &amp;context);</code></p>
+<p>具体代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">- (void)create</div><div class="line">&#123;</div><div class="line">    dispatch_async(dispatch_get_global_queue(0, 0), ^&#123;</div><div class="line">        _runLoopRef = CFRunLoopGetCurrent();</div><div class="line">        //初始化_source_context。</div><div class="line">        bzero(&amp;_source_context, sizeof(_source_context));</div><div class="line">        //这里创建了一个基于事件的源，绑定了一个函数</div><div class="line">        _source_context.perform = action;</div><div class="line">        //参数</div><div class="line">        _source_context.info = &quot;jiang&quot;;</div><div class="line">        //创建一个source</div><div class="line">        _source = CFRunLoopSourceCreate(NULL, 0, &amp;_source_context);</div><div class="line">        //将source添加到当前RunLoop中去</div><div class="line">        CFRunLoopAddSource(_runLoopRef, _source, kCFRunLoopDefaultMode);</div><div class="line">        //开启runloop 第三个参数设置为YES，执行完是否退出</div><div class="line">        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 100, YES);</div><div class="line">    &#125;);</div><div class="line"></div><div class="line"></div><div class="line">    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;</div><div class="line">        if (CFRunLoopIsWaiting(_runLoopRef)) &#123;</div><div class="line">            NSLog(@&quot;RunLoop 正在等待&quot;);</div><div class="line">            //添加标记</div><div class="line">            CFRunLoopSourceSignal(_source);</div><div class="line">            //手动唤醒</div><div class="line">            CFRunLoopWakeUp(_runLoopRef);</div><div class="line">        &#125;else &#123;</div><div class="line">            NSLog(@&quot;RunLoop 正在处理事件&quot;);</div><div class="line">            //添加标记，当上一个时间结束，立即执行此时间。</div><div class="line">            CFRunLoopSourceSignal(_source);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">//输入源所需事件方法</div><div class="line">static void action(void* info)&#123;</div><div class="line">    NSLog(@&quot;i&apos;m running&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
 <li><p><code>CFRunLoopTimerRef</code></p>
 <ul>
@@ -402,7 +424,8 @@
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</div><div class="line">    kCFRunLoopEntry         = (1UL &lt;&lt; 0), // 即将进入Loop</div><div class="line">    kCFRunLoopBeforeTimers  = (1UL &lt;&lt; 1), // 即将处理 Timer</div><div class="line">    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2), // 即将处理 Source</div><div class="line">    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5), // 即将进入休眠</div><div class="line">    kCFRunLoopAfterWaiting  = (1UL &lt;&lt; 6), // 刚从休眠中唤醒</div><div class="line">    kCFRunLoopExit          = (1UL &lt;&lt; 7), // 即将退出Loop</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>将要休眠时执行操作，例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CFRunLoopRef runLoop = CFRunLoopGetCurrent();</div><div class="line">CFStringRef runLoopMode = kCFRunLoopDefaultMode;</div><div class="line">CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, kCFRunLoopBeforeWaiting, true, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity _) &#123;</div><div class="line">    // 做你想做的。</div><div class="line">&#125;);</div><div class="line">CFRunLoopAddObserver(runLoop, observer, runLoopMode);</div></pre></td></tr></table></figure></p>
+<p>将要休眠时执行操作，例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CFRunLoopRef runLoop = CFRunLoopGetCurrent();</div><div class="line">CFStringRef runLoopMode = kCFRunLoopDefaultMode;</div><div class="line">CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, kCFRunLoopBeforeWaiting, true, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity _) &#123;</div><div class="line">    // 做你想做的。</div><div class="line">&#125;);</div><div class="line">CFRunLoopAddObserver(runLoop, observer, runLoopMode);</div></pre></td></tr></table></figure>
 <h3 id="Run-Loop运行接口"><a href="#Run-Loop运行接口" class="headerlink" title="Run Loop运行接口"></a>Run Loop运行接口</h3><ul>
 <li><code>Foundation</code>下：<code>NSRunLoop</code>，与之对应的<code>Core Foundation</code>:<code>CFRunLoopRef</code>。接口的形式大同小异，但是<code>CFRunLoopRef</code>拥有<code>NSRunLoop</code>所没有的功能，比如：添加自定义<code>Input Source</code>事件源。</li>
 </ul>
@@ -627,6 +650,13 @@
             </div>
           
 
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
           
 
           
