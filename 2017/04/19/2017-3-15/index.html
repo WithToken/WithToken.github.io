@@ -93,7 +93,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/04/19/2017-3-15/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
 <meta property="og:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
-<meta property="og:updated_time" content="2017-04-19T14:37:35.000Z">
+<meta property="og:updated_time" content="2017-06-23T13:56:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="理解Run Loop">
 <meta name="twitter:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
@@ -513,9 +513,10 @@
 </li>
 <li><p>常见面试题：</p>
 <ul>
-<li><p>RunLoop数据结构：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">struct __CFRunLoopMode &#123;</div><div class="line">    CFStringRef _name;            // Mode Name, 例如 @&quot;kCFRunLoopDefaultMode&quot;</div><div class="line">    CFMutableSetRef _sources0;    </div><div class="line">    CFMutableSetRef _sources1;    </div><div class="line">    CFMutableArrayRef _observers; </div><div class="line">    CFMutableArrayRef _timers;    </div><div class="line">    ...</div><div class="line">&#125;;</div><div class="line"> </div><div class="line">struct __CFRunLoop &#123;</div><div class="line">    CFMutableSetRef _commonModes;     // Set</div><div class="line">    CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;</div><div class="line">    CFRunLoopModeRef _currentMode;    // Current Runloop Mode</div><div class="line">    CFMutableSetRef _modes;           // Set</div><div class="line">    ...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>RunLoop数据结构：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">struct __CFRunLoopMode &#123;</div><div class="line">    	CFStringRef _name;            // Mode Name, 例如 @&quot;kCFRunLoopDefaultMode&quot;</div><div class="line">    	CFMutableSetRef _sources0;    </div><div class="line">    	CFMutableSetRef _sources1;    </div><div class="line">    	CFMutableArrayRef _observers; </div><div class="line">    	CFMutableArrayRef _timers;    </div><div class="line">    	...</div><div class="line">&#125;;</div><div class="line">struct __CFRunLoop &#123;</div><div class="line">    	CFMutableSetRef _commonModes;     // Set</div><div class="line">    	CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;</div><div class="line">    	CFRunLoopModeRef _currentMode;    // Current Runloop Mode</div><div class="line">    	CFMutableSetRef _modes;           // Set</div><div class="line">    	...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<ul>
 <li><p><code>SDWebImage</code>是怎么使用<code>RunLoop</code>的：大家可以去阅读以下<code>SDWebImage</code>源码，后期会写上<code>SDWebImage</code>的源码阅读。</p>
 </li>
 <li><p>RunLoop 的实现原理：通过do-while死循环让程序持续运行：接收用户输入，调度处理事件时间。</p>
