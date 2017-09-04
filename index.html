@@ -245,7 +245,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-iOS " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/04/2017-9-4/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -272,7 +272,7 @@
               
                 
                 <a class="post-title-link" href="/2017/09/04/2017-9-4/" itemprop="url">
-                  未命名
+                  RunTime 方法总结（上）
                 </a>
               
             
@@ -298,6 +298,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -325,158 +347,14 @@
 
       
         
-          
-            <h1 id="RunTime-方法总结（上）"><a href="#RunTime-方法总结（上）" class="headerlink" title="RunTime 方法总结（上）"></a>RunTime 方法总结（上）</h1><blockquote>
-<p>看了很多关于<code>RunTime</code>的东西，概念的东西有的博客已经讲的很好的，后面贴上自己认为比较好的链接。这里主要收集一些，平常用<code>RunTime</code>都干了啥，有自己平常用到的，也有网上收集的，以防用到，并且加深一下印象。方便你我他。</p>
-</blockquote>
-<p>[TOC]</p>
-<h2 id="常见的-category-中添加属性"><a href="#常见的-category-中添加属性" class="headerlink" title="常见的 category 中添加属性"></a>常见的 <code>category</code> 中添加属性</h2><ul>
-<li>这个讲的就多了。都知道的，分类中添加的 <code>@property</code> ，是可以调用 <code>set</code> 和 <code>get</code> 方法，但是如果你写上 <code>_var</code> 的话会报错。 <code>@property</code> 的本质是 <code>set + get + _var</code>，由此可见：在分类里添加属性，只是实现了方法的声明，并没有实现。那么此时我们就可以用 <code>runtime</code> 去达到我们的目的。</li>
-</ul>
-<p>首先看一下需要用到的两个方法：</p>
-<p>set 方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// id object：要添加属性的对象，一般设置为 self</div><div class="line">// const void *key 属性名称</div><div class="line">// id value 属性值，注意类型</div><div class="line">// objc_AssociationPolicy policy 保存策略，类似 @property 的修饰符</div><div class="line">objc_setAssociatedObject(&lt;#id object#&gt;, &lt;#const void *key#&gt;, &lt;#id value#&gt;, &lt;#objc_AssociationPolicy policy#&gt;)</div></pre></td></tr></table></figure>
-<p>get 方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// id object：要添加属性的对象，一般设置为 self</div><div class="line">// const void *key 属性名称</div><div class="line">objc_getAssociatedObject(&lt;#id object#&gt;, &lt;#const void *key#&gt;)</div></pre></td></tr></table></figure>
-<p>具体操作：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">typedef void (^breathFinishBlock)();</div><div class="line"></div><div class="line">@interface UIView (Breath)</div><div class="line"></div><div class="line">@property (nonatomic, strong) breathFinishBlock finishBlock;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line">#import &lt;objc/runtime.h&gt;</div><div class="line"></div><div class="line">static const void *breathKey = &amp;breathKey;</div><div class="line"></div><div class="line">@implementation NSObject (category)</div><div class="line"></div><div class="line">- (breathFinishBlock)finishBlock &#123;</div><div class="line">    return objc_getAssociatedObject(self, breathKey);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)setFinishBlock:(breathFinishBlock)finishBlock &#123;</div><div class="line">    objc_setAssociatedObject(self, breathKey, finishBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
-<ul>
-<li>我这里关联的一个 block ，注意 <code>static const void *breathKey = &amp;breathKey</code> 的写法，记住也可以。这个根据具体需求了，应该在分类中设置属性值的时候需要一些额外操作的时候有必要增加属性。</li>
-</ul>
-<h2 id="方法交换（防crash、AOP编程，无埋点等）"><a href="#方法交换（防crash、AOP编程，无埋点等）" class="headerlink" title="方法交换（防crash、AOP编程，无埋点等）"></a>方法交换（防crash、AOP编程，无埋点等）</h2><h3 id="交换原生方法"><a href="#交换原生方法" class="headerlink" title="交换原生方法"></a>交换原生方法</h3><p>可以写一个 <code>NSObject</code> 的 <code>category</code> 添加交换方法的方法。</p>
-<blockquote>
-<p>SEL 就是对方法的一种包装。包装的 SEL 类型数据它对应的方法地址，找到方法地址调用方法。通俗就是找 IMP。</p>
-<p>类的方法列表会把选择子的名称映射到相关的方法实现之上，使得“动态消息派发系统”能够由此找到应该调用的方法。这些方法均以函数指针的形式来表示，该指针就叫做 IMP。</p>
-<p>SEL 和 IMP 其实就是 Class（类对象）方法列表的键值对，SEL : IMP。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">+ (void)swizzleSEL:(SEL)originalSEL withSEL:(SEL)swizzledSEL</div><div class="line">&#123;</div><div class="line">    Class class = [self class];</div><div class="line">    // 原来的方法</div><div class="line">    Method originalMethod = class_getInstanceMethod(class, originalSEL);</div><div class="line">    // 新方法</div><div class="line">    Method swizzledMethod = class_getInstanceMethod(class, swizzledSEL);</div><div class="line">    // 先添加 IMP ，以防止 SEL 没有IMP 的情况</div><div class="line">    BOOL didAddMethod =</div><div class="line">    class_addMethod(class,</div><div class="line">                    originalSEL,</div><div class="line">                    method_getImplementation(swizzledMethod),</div><div class="line">                    method_getTypeEncoding(swizzledMethod));</div><div class="line">    </div><div class="line">    if (didAddMethod) &#123;</div><div class="line">    // 如果添加成功，说明原来的 SEL 没有 IMP ，将原来的 SEL 的 IMP 替换到新的 SEL 的 IMP上</div><div class="line">        class_replaceMethod(class,</div><div class="line">                            swizzledSEL,</div><div class="line">                            method_getImplementation(originalMethod),</div><div class="line">                            method_getTypeEncoding(originalMethod));</div><div class="line">    &#125; else &#123;</div><div class="line">    // 失败的话，直接交换两者的 IMP</div><div class="line">        method_exchangeImplementations(originalMethod, swizzledMethod);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>举个例子我项目中下载功能，每次 pop 出 vc 的时候需要停止下载，以前我的做法就是每次在 <code>viewWillDisappear</code> 中都会加上这句代码 <code>[[DownloadManager sharedManager] stopDownload];</code>。这样当然没问题啦，只是每次都加很奇怪不是么。并且项目维护也麻烦，就可以进行下面的操作。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">+ (void)load &#123;</div><div class="line">    static dispatch_once_t onceToken;</div><div class="line">    dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">        [self swizzleSEL:@selector(viewDidDisappear:) withSEL:@selector(WJViewDidDisappear:)];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJViewDidDisappear:(BOOL)animated &#123;</div><div class="line">    [self WJViewDidDisappear:animated];</div><div class="line">    [[DownloadManager sharedManager] stopDownload];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>新建个 UIViewController 的分类在 <code>+ (void)load</code> 交换方法，<code>WJViewDidDisappear</code> 方法里又调用了本身，是没有问题的。因为已经替换了嘛！调用的其实不是自己。这下就不需要在每个 vc 里加上停止下载这个代码了。</p>
-</li>
-<li><p>问为什么在 load 里交换方法？设计到了 load 和 initialize 的区别，这里在面试中也有可能会问的。initialize 跟我们平常写的懒加载意思一样，只有该类接受到消息才会去调用这个方法，如果没有调用类的实例方法和类方法，initialize 是不会走的。load 就不是，load 方法在这个文件被程序装载时调用，是必须会调用到的。</p>
-</li>
-<li><p>关于两个方法跟父类的关系，如果子类没有实现 load ，则父类也不会调用。反之，如果子类没有实现 initialize ，则父类依然会调用。</p>
-</li>
-<li><p>dispatch_once 加上这句为了防止循环调用，万一调用两次，换来换去最后等于没换。</p>
-</li>
-</ul>
-<h3 id="防crash中的方法交换"><a href="#防crash中的方法交换" class="headerlink" title="防crash中的方法交换"></a>防crash中的方法交换</h3><blockquote>
-<p>这里举两个例子，一个是 <code>NSNotification</code> 的防 crash 方案，一个是 Container 类型的防 crash 方案。</p>
-</blockquote>
-<ul>
-<li><p>首先 <code>NSNotification</code> 的操作。一般由 <code>NSNotification</code> 引起的的crash一般是因为对象添加了 <code>nostification</code> 之后，dealloc时候，仍然持有 <code>nostification</code> ，就会出现关于 <code>nostification</code> 的crash。所以在我们日常开发中往往 <code>和</code>是对应的，你有 <code>addObserver</code> 就应该有 <code>removeObserver</code>。但是往往你有忘记的时候，所以我们可以这样做：</p>
-<ul>
-<li>首先我们考虑的是：在 <code>dealloc</code> 中我们应该去执行 <code>[[NSNotificationCenter defaultCenter]removeObserver:self];</code> 移除掉所有的通知。首先创建个 <code>NSObject</code> 的分类，<code>hook</code> 下 <code>- (void)dealloc</code> 方法，方法中加入移除通知代码。但是，这样会有一个问题，如果有对象没有添加通知，也去执行移除通知的代码，就做了多余的操作。然后可以这样做，我们再次 <code>hook</code> 一下 <code>NSNotificationCenter</code> 的 <code>addObserver:selector:name:object:</code> 方法，去对添加了通知的对象设置个属性，在移除的时候加以判断。具体代码：</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">#import &quot;NSNotificationCenter+hook.h&quot;</div><div class="line">#import &quot;NSObject+Swizzling.h&quot;</div><div class="line"></div><div class="line">@implementation NSNotificationCenter (hook)</div><div class="line"></div><div class="line">+ (void)load &#123;</div><div class="line">    static dispatch_once_t onceToken;</div><div class="line">    dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">        [self swizzleSEL:@selector(addObserver:selector:name:object:) withSEL:@selector(WJAddObserver:selector:name:object:)];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJAddObserver:(id)observer selector:(SEL)aSelector name:(NSNotificationName)aName object:(id)anObject &#123;</div><div class="line">    [observer setValue:@1 forKey:@&quot;isAddObserver&quot;];</div><div class="line">    [self WJAddObserver:observer selector:aSelector name:aName object:anObject];</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>这里我给 <code>NSObject</code> 的分类添加了一个 <code>isAddObserver</code> 的属性，用的是上面的方法（给分类添加属性）。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">.h</div><div class="line">#import &lt;Foundation/Foundation.h&gt;</div><div class="line"></div><div class="line">@interface NSObject (hook)</div><div class="line"></div><div class="line">@property (nonatomic , assign) BOOL isAddObserver;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line"></div><div class="line">.m</div><div class="line">#import &quot;NSObject+hook.h&quot;</div><div class="line">#import &lt;objc/runtime.h&gt;</div><div class="line">#import &quot;NSObject+Swizzling.h&quot;</div><div class="line"></div><div class="line">static const void *isAddObserverKey = &amp;isAddObserverKey;</div><div class="line">@implementation NSObject (hook)</div><div class="line"></div><div class="line">- (BOOL)isAddObserver &#123;</div><div class="line">    return objc_getAssociatedObject(self, isAddObserverKey);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)setIsAddObserver:(BOOL)isAddObserver &#123;</div><div class="line">    objc_setAssociatedObject(self, isAddObserverKey, @(isAddObserver), OBJC_ASSOCIATION_ASSIGN);</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (void)load &#123;</div><div class="line">    static dispatch_once_t onceToken;</div><div class="line">    dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">        [self swizzleSEL:NSSelectorFromString(@&quot;dealloc&quot;) withSEL:@selector(WJDealloc)];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJDealloc &#123;</div><div class="line">    if (self.isAddObserver &amp;&amp; ![NSStringFromClass([self class]) containsString:@&quot;_&quot;]) &#123;</div><div class="line">        NSLog(@&quot;移除了%@的通知&quot;,NSStringFromClass([self class]));</div><div class="line">        self.isAddObserver = NO;</div><div class="line">        [[NSNotificationCenter defaultCenter]removeObserver:self];</div><div class="line">    &#125;</div><div class="line">    [self WJDealloc];</div><div class="line">&#125;</div><div class="line">@end</div></pre></td></tr></table></figure>
-<ul>
-<li><p>给对象添加属性，用于判断对象是否添加通知，这个方法不知道好不好，也想不出有没有好的办法，所以有好的方法的大佬能够联系一下。</p>
-</li>
-<li><p>注意 <code>NSSelectorFromString(@&quot;dealloc&quot;)</code> 的写法，直接 <code>@selector(dealloc)</code> 是会报错的。</p>
-</li>
-<li><p>另外我在 <code>hook</code> 的 <code>dealloc</code> 方法中加了一个判断 <code>![NSStringFromClass([self class]) containsString:@&quot;_&quot;]</code>，因为系统的对象也有添加通知，我目前看到的是以开头为‘_’的对象名，所以过滤掉了，有点不严谨。不加判断也没关系。</p>
-</li>
-</ul>
-<h3 id="AOP编程，无埋点中方法交换"><a href="#AOP编程，无埋点中方法交换" class="headerlink" title="AOP编程，无埋点中方法交换"></a>AOP编程，无埋点中方法交换</h3><blockquote>
-<p>关于无埋点，这里只说一下需要 hook 的方法有哪些，有兴趣的可以看看网易的那篇无埋点文章和一位简书作者的文章，后面给链接，需要 hook 的方法有哪些。</p>
-</blockquote>
-<p>关于无埋点，我们主要 hook 的方法可以有哪些：</p>
-<ul>
-<li><p>页面事件的收集，可以 hook <code>UIViewController</code> 的 <code>viewDidLoad</code>、<code>viewWillApper</code>、<code>viewWillDisApper</code>、<code>dealloc</code>。</p>
-</li>
-<li><p>点击事件的收集：</p>
-</li>
-</ul>
-<ol>
-<li><p>button 的点击 hook <code>UIApplication</code> 中的 <code>sendAction:to:from:forEvent:</code>。</p>
-</li>
-<li><p>手势 hook <code>UIGestureRecognizer</code> 中的 <code>initWithTarget:action:</code> 和 <code>addTarget:action:</code>。</p>
-</li>
-<li><p>列表 ，如果是 <code>UITableView</code> hook <code>UITableView</code> 中的 <code>setDelegate</code> 和 <code>tableView:didSelectRowAtIndexPath</code>，<code>UICollectionView</code> 的话 hook <code>UICollectionView</code> 中的 <code>setDelegate</code> 和 <code>collectionView:didSelectItemAtIndexPath</code>。</p>
-</li>
-<li><p>弹框 ，<code>UIAlertView</code> 可以 hook <code>UIAlertView</code> 中的 <code>setDelegate</code> 和 <code>alertView:clickedButtonAtIndex:</code>，<code>UIActionSheet</code> 可以 hook <code>UIActionSheet</code> 中的 <code>setDelegate</code> 和 <code>actionSheet:clickedButtonAtIndex:</code>。</p>
-</li>
-</ol>
-<p>这里只交代一下页面事件的收集和点击事件收集。</p>
-<p>页面事件的收集：这里做 hook <code>viewWillAppear:</code> 与<code>viewWillDisappear:</code> 的演示。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">#import &quot;UIViewController+Hook.h&quot;</div><div class="line">#import &quot;NSObject+Swizzling.h&quot;</div><div class="line"></div><div class="line">@implementation UIViewController (Hook)</div><div class="line"></div><div class="line">+ (void)load &#123;</div><div class="line">    [self swizzleSEL:@selector(viewWillAppear:) withSEL:@selector(WJViewWillAppear:)];</div><div class="line">    [self swizzleSEL:@selector(viewWillDisappear:) withSEL:@selector(WJViewWillDisappear:)];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJViewWillAppear:(BOOL)animated &#123;</div><div class="line">    // 收集信息。</div><div class="line">    [self WJViewWillAppear:animated];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJViewWillDisappear:(BOOL)animated &#123;</div><div class="line">    // 收集信息。</div><div class="line">    [self WJViewWillDisappear:animated];</div><div class="line">&#125;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
-<ul>
-<li>页面的收集的信息，最好用一个 <code>plist</code> 去维护，分别在 <code>WJViewWillAppear:</code> 和 <code>WJViewWillDisappear:</code> 分别去加上页面出现和页面离开的 BOOL 标识，用这个 BOOL 标识和 VC 去 plist 找对应的收集信息，一般都是 pageID 吧！</li>
-</ul>
-<p>点击事件收集：hook <code>UIApplication</code> 中的 <code>sendAction:to:from:forEvent:</code>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">#import &quot;UIApplication+Hook.h&quot;</div><div class="line">#import &quot;NSObject+Swizzling.h&quot;</div><div class="line"></div><div class="line">@implementation UIApplication (Hook)</div><div class="line"></div><div class="line">+ (void)load &#123;</div><div class="line">    [self swizzleSEL:@selector(sendAction:to:from:forEvent:) withSEL:@selector(WJSendAction:to:from:forEvent:)];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (BOOL)WJSendAction:(SEL)action to:(nullable id)target from:(nullable id)sender forEvent:(nullable UIEvent *)event &#123;</div><div class="line">    </div><div class="line">    if (![target isKindOfClass:[UIViewController class]]) &#123;</div><div class="line">        id vc = [self viewController:target];</div><div class="line">        // vc</div><div class="line">    &#125; else &#123;</div><div class="line">        // taget</div><div class="line">    &#125;</div><div class="line">    return [self WJSendAction:action to:target from:sender forEvent:event];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (UIViewController *)viewController:(nullable id)target &#123;</div><div class="line">    for (UIView* next = [target superview]; next; next = next.superview) &#123;</div><div class="line">        UIResponder *nextResponder = [next nextResponder];</div><div class="line">        if ([nextResponder isKindOfClass:[UIViewController class]]) &#123;</div><div class="line">            return (UIViewController *)nextResponder;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return nil;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
-<ul>
-<li>action 是按钮点击的方法名，target 是触发消息的对象，sender 是对象类型， event 是动作类型。一般需要的信息方法里都能满足。在这里，如果不是 <code>UIViewController</code> 我会去查找 view 最终属于的 <code>UIViewController</code> 。收集做法可以跟上面的页面事件收集一样，同样在 plist 中添加 event 标识，用来上传。这里有个问题，如果我一个 view 在 <code>viewcontroller</code> 有10个，每个 view 中的 button 点击都收集不同的埋点信息，应该怎么做？<ul>
-<li>可以在 NSObject 分类中添加一个属性，可是是一个字典属性，在我们点击按钮的时候，往该属性中设置值，key 可以是最终的 <code>UIViewController</code>，value 可是是你想要传的信息。这样在 <code>WJSendAction:to:from:forEvent:</code> 中通过获取到的 vc 去字典属性中找该 vc 需要的信息。这个貌似已经侵犯了业务。</li>
-<li>可以由我们的服务端发送给你信息表，通过返回的信息和你view信息做比较，通过服务端返回的表中的 <code>keyPath</code> 去 vc 中找对应的值，当然 vc 中需要上传的值还是需要以属性的方式存在。这其实就是网易的无埋点的处理方案，后面会放出链接，有兴趣的可以看看，写的很好。</li>
-<li>如果对收集的信息不是很严格，还可以不 hook <code>UIApplication</code> 的方法，直接去 hook UIControl 中的 <code>sendAction:to:forEvent:</code> ，通过拼接 <code>target</code> ，<code>action</code> 和 <code>tag</code> 组成唯一的收集信息。例如：<code>@&quot;homeViewController_action_tag1&quot;</code> 这样</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>最后说一下关于列表的信息怎么收集，关系到 hook <code>delegate</code>。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">#import &quot;UITableView+Hook.h&quot;</div><div class="line">#import &quot;NSObject+MemoryLeak.h&quot;</div><div class="line">#import &lt;objc/message.h&gt;</div><div class="line"></div><div class="line">@implementation UITableView (Hook)</div><div class="line"></div><div class="line">+ (void) load &#123;</div><div class="line">    static dispatch_once_t onceToken;</div><div class="line">    dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">        [self swizzleSEL:@selector(setDelegate:) withSEL:@selector(WJSetDelegate:)];</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)WJSetDelegate:(id&lt;UITableViewDelegate&gt;)delegate &#123;</div><div class="line">    [self WJSetDelegate:delegate];</div><div class="line">    </div><div class="line">    Class class = [delegate class];</div><div class="line">    </div><div class="line">    if (class_addMethod(class, NSSelectorFromString(@&quot;WJTableViewDidSelectRowAtIndexPath&quot;), (IMP)WJTableViewDidSelectRowAtIndexPath, &quot;v@:@@&quot;)) &#123;</div><div class="line">        Method dis_originalMethod = class_getInstanceMethod(class, NSSelectorFromString(@&quot;WJTableViewDidSelectRowAtIndexPath&quot;));</div><div class="line">        Method dis_swizzledMethod = class_getInstanceMethod(class, @selector(tableView:didSelectRowAtIndexPath:));</div><div class="line">        </div><div class="line">        method_exchangeImplementations(dis_originalMethod, dis_swizzledMethod);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div><div class="line"></div><div class="line">void WJTableViewDidSelectRowAtIndexPath(id self, SEL _cmd, id tableView, id indexpath)</div><div class="line">&#123;</div><div class="line">    SEL selector = NSSelectorFromString(@&quot;WJTableViewDidSelectRowAtIndexPath&quot;);</div><div class="line">    ((void(*)(id, SEL,id, id))objc_msgSend)(self, selector, tableView, indexpath);</div><div class="line">    </div><div class="line">    NSLog(@&quot;你现在正在点击的是%@页面的第%ld栏第%ld行&quot;,NSStringFromClass([self class]),((NSIndexPath *)indexpath).section,((NSIndexPath *)indexpath).row);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
-<ul>
-<li>注意下，这里跟以前的交换不同，在 <code>- (void)WJSetDelegate:(id&lt;UITableViewDelegate&gt;)delegate</code> 里交换的 <code>tableView:didSelectRowAtIndexPath:</code> 方法，应该是在响应 <code>delegate</code> 的对象中交换的，而不是 <code>self</code> 了。</li>
-</ul>
-<h2 id="关于跳转-VC（万能跳转方法）"><a href="#关于跳转-VC（万能跳转方法）" class="headerlink" title="关于跳转 VC（万能跳转方法）"></a>关于跳转 VC（万能跳转方法）</h2><blockquote>
-<p>项目中往往会有很多的 vc ，然后这些 vc 有可能在一个地方需要用到去 push，然后就会有很多 case 语句，简直烦，所以可以用 runtime 做跳转，我们只需要知道 vc 的名字（字符串形式），就可以去 push。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">- (void)push &#123;</div><div class="line">    NSString *class = @&quot;vc名&quot;;</div><div class="line">    const char *className = [class cStringUsingEncoding:NSASCIIStringEncoding];</div><div class="line">    Class newClass = objc_getClass(className);</div><div class="line">    if (!newClass) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line">    NSDictionary *dic = @&#123;@&quot;属性&quot; : @&quot;属性值&quot; , @&quot;属性&quot; : @&quot;属性值&quot;&#125;;</div><div class="line">    id controller = [[newClass alloc]init];</div><div class="line">    NSArray *names = [self getProperties:controller];</div><div class="line">    for (NSString *name in names) &#123;</div><div class="line">        //如果字典中的值为空，赋值会出问题</div><div class="line">        if (dic[name]) &#123;</div><div class="line">            [controller setValue:dic[name] forKey:name];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    [self.navigationController pushViewController:controller animated:YES];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (NSArray *)getProperties:(id)controller &#123;</div><div class="line">    NSMutableArray *mArray = [NSMutableArray array];</div><div class="line">    id vc = [controller class];</div><div class="line">    // 以防有继承父类，直到类名不为 UIViewController 结束</div><div class="line">    while ([vc isSubclassOfClass:[UIViewController class]] &amp;&amp; ![NSStringFromClass(vc) isEqualToString:@&quot;UIViewController&quot;]) &#123;</div><div class="line">        // 获取当前类的所有属性</div><div class="line">        unsigned int count;// 记录属性个数</div><div class="line">        objc_property_t *properties = class_copyPropertyList(vc, &amp;count);</div><div class="line">        // 遍历</div><div class="line">        for (int i = 0; i &lt; count; i++) &#123;</div><div class="line">            // objc_property_t 属性类型</div><div class="line">            objc_property_t property = properties[i];</div><div class="line">            // 获取属性的名称 C语言字符串</div><div class="line">            const char *cName = property_getName(property);</div><div class="line">            // 转换为Objective C 字符串</div><div class="line">            NSString *name = [NSString stringWithCString:cName encoding:NSUTF8StringEncoding];</div><div class="line">            [mArray addObject:name];</div><div class="line">        &#125;</div><div class="line">        free(properties);</div><div class="line">        vc = [vc superclass];</div><div class="line">    &#125;</div><div class="line">    return mArray.copy;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>这里加了 while 循环，防止设置的属性存在于父类中。</li>
-</ul>
-<h2 id="消息转发"><a href="#消息转发" class="headerlink" title="消息转发"></a>消息转发</h2><p>说下消息转发具体步骤，这也是面试中会问的问题。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Terminating app due to uncaught exception &apos;NSInvalidArgumentException&apos;, reason: &apos;-[MyViewController buttonAction1]: unrecognized selector sent to instance 0x7f7fc4e07ea0&apos;</div></pre></td></tr></table></figure>
-<p>当对象接受到无法解读的消息的时候，就会启动“消息转发”，我们可以在这个机制中做些什么，去处理未知消息。</p>
-<p>消息转发分为两大阶段：</p>
-<ul>
-<li>动态方法解析：征询所属的类，是否可以动态添加方法（该方法要已经实现），去处理未知消息</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 实例方法</div><div class="line">+ (BOOL)resolveInstanceMethod:(SEL)sel;</div><div class="line">// 类方法</div><div class="line">+(BOOL)resolveClassMethod:(SEL)sel;</div></pre></td></tr></table></figure>
-<p>参数就是未知的选择子，可以在方法内动态添加方法</p>
-<p> <code>class_addMethod(Class cls, SEL name, IMP imp,  const char *types)</code></p>
-<ul>
-<li><p>备援接受者：如果上面一步没法处理消息，则当前接受者还有第二次机会能处理未知的选择子，这一步做的事就是把消息转给其他接受者去处理。</p>
-<p><code>-(id)forwardingTargetForSelector:(SEL)aSelector</code></p>
-<p>参数代表未知的选择子，如当前接受者能找到备援对象，则返回并把消息发送给该对象（对象不可以为self，会无限循环）。如找不到，就返回nil，运行时系统会继续调用 <code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector</code> 方法来获得方法签名(方法的参数和返回值的信息)，如果该方法返回的是 nil, 运行时系统会抛出unrecognized 的crash。</p>
-</li>
-<li><p>完整的消息转发</p>
-<p>如果上一步还不能处理未知消息，则开始完整的消息转发机制。首先创建 NSInvocation 对象，把与尚未处理的那条消息有关的全部细节封装在其中。此对象包含选择子、目标（target）以及参数。方法为：</p>
-<p><code>-(void)forwardInvocation:(NSInvocation *)anInvocation</code>。</p>
-<p>此方法改用调用对象，使新的对象接受消息。并且可以追加参数等操作。当使用此方法时，要重写<code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector</code> 方法，用此方法给selector提供方法签名，方法签名记录了方法的参数和返回值的信息。如果这个方法返回 nil，也将抛出 unrecognized 的 crash。</p>
-</li>
-</ul>
-<h3 id="多重代理"><a href="#多重代理" class="headerlink" title="多重代理"></a>多重代理</h3><blockquote>
-<p>就是利用消息转发中的 <code>forwardInvocation</code> 方法将消息发送给你需要让其接受消息的对象中。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector &#123;</div><div class="line">    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];</div><div class="line">    if (!signature) &#123;</div><div class="line">        for (id target in self.targets) &#123;</div><div class="line">            if (signature == [target methodSignatureForSelector:aSelector]) &#123;</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return signature;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;</div><div class="line">    for (id target in self.targets) &#123;</div><div class="line">        if ([target respondsToSelector:anInvocation.selector]) &#123;</div><div class="line">            [anInvocation invokeWithTarget:target];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>重写 methodSignatureForSelector 方法，获取方法签名，再重写 forwardInvocation 方法，向对象数组中发送消息。例子：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">- (void)multipleProxy &#123;</div><div class="line">    ViewController *vc = [[ViewController alloc]init];</div><div class="line">    NSArray *targets = @[vc];</div><div class="line">    WJMultipleProxy *multipleProxy = [[WJMultipleProxy alloc]init];</div><div class="line">    multipleProxy.delegateTargets = targets;</div><div class="line">    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];</div><div class="line">    tableView.dataSource = (id&lt;UITableViewDataSource&gt;)multipleProxy;</div><div class="line">    tableView.delegate   = (id&lt;UITableViewDelegate&gt;)multipleProxy;</div><div class="line">    tableView.backgroundColor = [UIColor clearColor];    </div><div class="line">    [self.view addSubview:tableView];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>创建 WJMultipleProxy 对象，需接受消息对象属性数组赋值，将 tableview 的代理对象设置为 WJMultipleProxy 。即可以在对象数组中接受 tableview 的代理方法</li>
-</ul>
-<h3 id="拦截调用"><a href="#拦截调用" class="headerlink" title="拦截调用"></a>拦截调用</h3><h3 id="消息转发（动态添加方法）"><a href="#消息转发（动态添加方法）" class="headerlink" title="消息转发（动态添加方法）"></a>消息转发（动态添加方法）</h3><ul>
-<li>利用消息转发机制中的动态方法解析这步，<code>class_addMethod(Class cls, SEL name, IMP imp,  const char *types)</code>此方法添加方法。</li>
-</ul>
-<blockquote>
-<p>篇幅有点大，所以分为了上下两节。下节有关于：json 转 model 的实现、KVO 中的 runtime ，cell 分割线的实例、归档与解档、一些 runtime 的基本操作总结、安全的 json 、面试常问。后面有想到的或者看到的都加在后面一篇中。这两天会放代码在GitHub上。</p>
-</blockquote>
-
-          
+          <p>总结 runtime 概念及基本用法。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/09/04/2017-9-4/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
