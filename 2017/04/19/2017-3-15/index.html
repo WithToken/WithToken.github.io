@@ -93,7 +93,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/04/19/2017-3-15/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
 <meta property="og:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
-<meta property="og:updated_time" content="2017-09-04T15:57:17.000Z">
+<meta property="og:updated_time" content="2017-09-13T13:47:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="理解Run Loop">
 <meta name="twitter:description" content="理解Run Loop概念、数据结构解释、实例运用、总结心得。">
@@ -373,9 +373,9 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_D EFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread)  onThread:[NSThread     currentThread] withObject:nil waitUntilDone:NO];</div><div class="line"></div><div class="line">&#125;);</div><div class="line"></div><div class="line">- (void)otherThread &#123;</div><div class="line">  NSLog(@&quot;me&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>最后运行发现，最终并没有调用<code>otherThread</code>方法，原因是当我们执行<code>[self performSelector:@selector(otherThread)  onThread:[NSThread currentThread] withObject:nil waitUntilDone:NO];</code>其内部会创建一个 Timer 并添加到当前线程的 RunLoop 中。所以如果当前线程没有 RunLoop，则这个方法会失效。我们改成下面的样子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread) onThread:[NSThread     currentThread] withObject:nil waitUntilDone:NO];</div><div class="line">    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];</div><div class="line">    [runLoop run];</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;</div><div class="line">    [self performSelector:@selector(otherThread) onThread:[NSThread currentThread] withObject:nil waitUntilDone:NO];</div><div class="line">    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];</div><div class="line">    [runLoop run];</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <ul>
-<li>基于端口的输入源：Source1。通过内置的端口相关的对象和函数，创建配置基于端口的输入源。   例如可以使用NSPort的方法把该端口添加到 RunLoop。</li>
+<li>基于端口的输入源：Source1。通过内置的端口相关的对象和函数，创建配置基于端口的输入源。例如可以使用NSPort的方法把该端口添加到 RunLoop。</li>
 <li>自定义输入源，以<code>CFRunLoopSourceRef</code>创建。</li>
 <li>定时源（Timer）事件。</li>
 <li>启动<code>Run Loop</code>前要添加监听输入源事件或者<code>Timer Source</code>。否则运行<code>Run Loop</code>会直接返回。如下：</li>
@@ -412,7 +412,7 @@
 <li><p><code>CFRunLoopTimerRef</code></p>
 <ul>
 <li><p><code>NSTimer</code>和<code>performSEL</code>方法实际上是对<code>CFRunloopTimerRef</code>的封装。方法为:</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">  // 需要手动添加到mode中</div><div class="line"> + (NSTimer *)timerWithTimeInterval:(NSTimeInterval)ti invocation:(NSInvocation *)invocation repeats:(BOOL)yesOrNo;  </div><div class="line"> // 默认添加到NSDefaultRunLoopMode中</div><div class="line"> + (NSTimer *)scheduledTimerWithTimeInterval:    (NSTimeInterval)ti invocation:(NSInvocation *)invocation repeats:(BOOL)yesOrNo;</div><div class="line">// 实际上其内部会创建一个 Timer 并添加到当前线程的 RunLoop 中。所以如果当前线程没有 RunLoop，则这个方法会失效。</div><div class="line">- (void)performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay</div></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">  // 需要手动添加到mode中</div><div class="line"> + (NSTimer *)timerWithTimeInterval:(NSTimeInterval)ti invocation:(NSInvocation *)invocation repeats:(BOOL)yesOrNo;  </div><div class="line"> // 默认添加到NSDefaultRunLoopMode中</div><div class="line"> + (NSTimer *)scheduledTimerWithTimeInterval:(NSTimeInterval)ti invocation:(NSInvocation *)invocation repeats:(BOOL)yesOrNo;</div><div class="line">// 实际上其内部会创建一个 Timer 并添加到当前线程的 RunLoop 中。所以如果当前线程没有 RunLoop，则这个方法会失效。</div><div class="line">- (void)performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay</div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
