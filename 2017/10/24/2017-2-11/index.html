@@ -93,7 +93,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/10/24/2017-2-11/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
 <meta property="og:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
-<meta property="og:updated_time" content="2017-10-24T09:07:59.787Z">
+<meta property="og:updated_time" content="2017-10-24T09:18:50.466Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Masonry 源码阅读">
 <meta name="twitter:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
@@ -494,12 +494,10 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">newConstraint.delegate = self;</div><div class="line">[self.childConstraints addObject:newConstraint];</div></pre></td></tr></table></figure>
 <h2 id="equalTo-superview"><a href="#equalTo-superview" class="headerlink" title="equalTo(superview)"></a>equalTo(superview)</h2><ul>
-<li><p>过程跟上面一样，不做阐述。</p>
-<p> 最后执行<code>return [constraintMaker install];</code><br><code>make.height.equalTo(@10.0f)</code>这条约束的<code>install</code>调用链为：其他三条约束<code>make.height.equalTo(@10.0f);
+<li>过程跟上面一样，不做阐述。<br>最后执行<code>return [constraintMaker install];</code><br><code>make.height.equalTo(@10.0f)</code>这条约束的<code>install</code>调用链为：其他三条约束<code>make.height.equalTo(@10.0f);
   make.edges.mas_equalTo(UIEdgeInsetsMake(10.0f, 0, 10.0f, 0));
   make.size.mas_equalTo(CGSizeMake(10.0, 20.0));
-  make.left.right.and.bottom.equalTo(superview);</code>在下面<code>install</code>之后多了一步:</p>
-</li>
+  make.left.right.and.bottom.equalTo(superview);</code>在下面<code>install</code>之后多了一步:</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">MASCompositeConstraint.m</div><div class="line">- (void)install &#123;</div><div class="line">    for (MASConstraint *constraint in self.childConstraints) &#123;</div><div class="line">        constraint.updateExisting = self.updateExisting;</div><div class="line">        [constraint install];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
@@ -533,8 +531,8 @@
 </ul>
 <h1 id="End-Masonry中的链式语法"><a href="#End-Masonry中的链式语法" class="headerlink" title="End:Masonry中的链式语法"></a>End:Masonry中的链式语法</h1><p>Masonry中的主要是依靠</p>
 <ul>
-<li><code>- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>返回的类型，返回 <code>MASConstraint</code> 就可以继续使用点语法去设置属性。</li>
-<li>对 MASConstraint 子类对象设置 <code>delegate</code>。最后代理方法都是<code>- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>这个方法。反复这个过程。每次该方法返回的都是<code>MASConstraint</code>对象。就可以实现链式语法。具体实现：<ul>
+<li><code>- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>返回的类型，返回 <code>MASConstraint</code> 就可以继续使用点语法去设置属性。<ul>
+<li>对 MASConstraint 子类对象设置 <code>delegate</code>。最后代理方法都是<code>- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>这个方法。反复这个过程。每次该方法返回的都是<code>MASConstraint</code>对象。就可以实现链式语法。具体实现：</li>
 <li><code>make.left</code>第一步就是调用<code>MASConstraintMaker</code>中的<code>- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>方法。返回<code>MASConstraint</code>类型对象。</li>
 <li><code>(MASConstraint *).right</code>调用<code>MASConstraint.m</code>中的<code>- (MASConstraint *)right</code>，再调用<code>MASViewConstraint</code>中的<code>- (MASConstraint *)addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute</code>，该方法只调用了代理方法。即是，第一步中的<code>MASConstraintMaker</code>的方法。</li>
 <li><code>.and</code>实际没什么操作，只返回本身。跟<code>with</code>意思一样，为了方便好看吧！</li>
