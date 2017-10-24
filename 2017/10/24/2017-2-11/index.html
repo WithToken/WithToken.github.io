@@ -90,10 +90,10 @@
 <meta name="description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Masonry 源码阅读">
-<meta property="og:url" content="http://yoursite.com/2017/04/01/2017-2-11/index.html">
+<meta property="og:url" content="http://yoursite.com/2017/10/24/2017-2-11/index.html">
 <meta property="og:site_name" content="guodajiang's blog">
 <meta property="og:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
-<meta property="og:updated_time" content="2017-10-24T08:19:51.511Z">
+<meta property="og:updated_time" content="2017-10-24T08:50:38.228Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Masonry 源码阅读">
 <meta name="twitter:description" content="Masonry是一个轻量级的布局框架，拥有自己的描述语法，采用更优雅的链式语法封装自动布局，简洁明了，并具有高可读性。而且同时支持iOS和macOS。">
@@ -124,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/04/01/2017-2-11/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/10/24/2017-2-11/"/>
 
 
 
@@ -247,7 +247,7 @@
   
 
   <article class="post post-type-iOS " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/01/2017-2-11/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/24/2017-2-11/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="guodajiang">
@@ -286,8 +286,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-01T21:06:11+08:00">
-                2017-04-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-24T16:50:38+08:00">
+                2017-10-24
               </time>
             
 
@@ -355,7 +355,7 @@
 <ul>
 <li><code>isSizeAttribute</code>方法，该方法用来判断<code>MASViewAttribute</code>类中的<code>layoutAttribute</code>属性是否是<code>NSLayoutAttributeWidth</code>或者<code>NSLayoutAttributeHeight</code>，如果是<code>Width</code>或者<code>Height</code>的话，那么约束就添加到当前View上，而不是添加在父视图上。</li>
 </ul>
-<h2 id="2-MASCompositeConstraint-是MASConstraint的集合"><a href="#2-MASCompositeConstraint-是MASConstraint的集合" class="headerlink" title="2.MASCompositeConstraint 是MASConstraint的集合"></a>2.<code>MASCompositeConstraint</code> 是<code>MASConstraint</code>的集合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">_childConstraints = [children mutableCopy];</div><div class="line">    for (MASConstraint *constraint in _childConstraints) &#123;</div><div class="line">        constraint.delegate = self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-MASCompositeConstraint-是MASConstraint的集合"><a href="#2-MASCompositeConstraint-是MASConstraint的集合" class="headerlink" title="2.MASCompositeConstraint 是MASConstraint的集合"></a>2.<code>MASCompositeConstraint</code> 是<code>MASConstraint</code>的集合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">_childConstraints = [children mutableCopy];</div><div class="line">for (MASConstraint *constraint in _childConstraints) &#123;</div><div class="line">        constraint.delegate = self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <ul>
 <li>这段可以表示：<code>MASCompositeConstraint</code>是存放<code>MASConstraint</code>对象的一个集合也就是<code>_childConstraints</code>这个数组。</li>
 </ul>
@@ -388,12 +388,11 @@
 <p><code>View+MASAdditions</code>中还有两个方法，分别是：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *))block &#123;</div><div class="line">    self.translatesAutoresizingMaskIntoConstraints = NO;</div><div class="line">    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];</div><div class="line">    constraintMaker.updateExisting = YES;</div><div class="line">    block(constraintMaker);</div><div class="line">    return [constraintMaker install];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (NSArray *)mas_remakeConstraints:(void(^)(MASConstraintMaker *make))block &#123;</div><div class="line">    self.translatesAutoresizingMaskIntoConstraints = NO;</div><div class="line">    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];</div><div class="line">    constraintMaker.removeExisting = YES;</div><div class="line">    block(constraintMaker);</div><div class="line">    return [constraintMaker install];</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">看方法名可以看出来，分别的作用应该是，更新和重新添加约束。主要的区别就是分别对`MASConstraintMaker`对象分别设置了`updateExisting`和`removeExisting`为`YES`。这两个属性最后在``添加约束的时候用到。</div><div class="line"></div><div class="line">* updateExisting为`YES`的时候，`[constraintMaker install]`执行的时候，会将这个值赋给`MASConstraint`对象。</div></pre></td></tr></table></figure>
 <p>for (MASConstraint *constraint in constraints) {<br>        constraint.updateExisting = self.updateExisting;<br>        [constraint install];<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">`[constraint install]`一条一条对 `view` 配置约束。进到这个`install`方法中，用到`updateExisting`这个属性的地方：</div></pre></td></tr></table></figure></p>
-<p>MASLayoutConstraint *existingConstraint = nil;<br>if (self.updateExisting) {<br>        existingConstraint = [self layoutConstraintSimilarTo:layoutConstraint];<br>}<br>if (existingConstraint) {<br>    // just update the constant<br>    existingConstraint.constant = layoutConstraint.constant;<br>    self.layoutConstraint = existingConstraint;<br>} else {<br>    [self.installedView addConstraint:layoutConstraint];<br>    self.layoutConstraint = layoutConstraint;<br>    [firstLayoutItem.mas_installedConstraints addObject:self];<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> 最后的目的就是，如果检查是否存在这个约束，如果当前`view`存在这条约束，就更新该约束。没有就添加约束。</div><div class="line"></div><div class="line">*  `removeExisting`设置为`YES`时，在`[constraintMaker install]`方法中</div></pre></td></tr></table></figure></p>
-<p> if (self.removeExisting) {<br>        NSArray <em>installedConstraints = [MASViewConstraint installedConstraintsForView:self.view];<br>        for (MASConstraint </em>constraint in installedConstraints) {<br>            [constraint uninstall];<br>        }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">移除所有的约束，添加新的约束。</div><div class="line"></div><div class="line">&gt; make.height.equalTo(@10.0f);</div><div class="line"></div><div class="line">调用链为：</div></pre></td></tr></table></figure></p>
+<p>MASLayoutConstraint *existingConstraint = nil;<br>if (self.updateExisting) {<br>    existingConstraint = [self layoutConstraintSimilarTo:layoutConstraint];<br>}<br>if (existingConstraint) {<br>    // just update the constant<br>    existingConstraint.constant = layoutConstraint.constant;<br>    self.layoutConstraint = existingConstraint;<br>} else {<br>    [self.installedView addConstraint:layoutConstraint];<br>    self.layoutConstraint = layoutConstraint;<br>    [firstLayoutItem.mas_installedConstraints addObject:self];<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> 最后的目的就是，如果检查是否存在这个约束，如果当前`view`存在这条约束，就更新该约束。没有就添加约束。</div><div class="line"></div><div class="line">*  `removeExisting`设置为`YES`时，在`[constraintMaker install]`方法中</div></pre></td></tr></table></figure></p>
+<p>if (self.removeExisting) {<br>    NSArray <em>installedConstraints = [MASViewConstraint installedConstraintsForView:self.view];<br>    for (MASConstraint </em>constraint in installedConstraints) {<br>        [constraint uninstall];<br>    }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">移除所有的约束，添加新的约束。</div><div class="line"></div><div class="line">&gt; make.height.equalTo(@10.0f);</div><div class="line"></div><div class="line">调用链为：</div></pre></td></tr></table></figure></p>
 <ul>
-<li>(MASConstraint *)height {<br> return [self addConstraintWithLayoutAttribute:NSLayoutAttributeHeight];<br>}</li>
-</ul>
-<ul>
+<li><p>(MASConstraint *)height {<br>  return [self addConstraintWithLayoutAttribute:NSLayoutAttributeHeight];<br>}</p>
+</li>
 <li><p>(MASConstraint *)addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute {<br>  return [self constraint:nil addConstraintWithLayoutAttribute:layoutAttribute];<br>}</p>
 </li>
 <li><p>(MASConstraint <em>)constraint:(MASConstraint </em>)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute {<br>  MASViewAttribute <em>viewAttribute = [[MASViewAttribute alloc] initWithView:self.view layoutAttribute:layoutAttribute];<br>  MASViewConstraint </em>newConstraint = [[MASViewConstraint alloc] initWithFirstViewAttribute:viewAttribute];<br>  if ([constraint isKindOfClass:MASViewConstraint.class]) {</p>
@@ -414,18 +413,19 @@ return compositeConstraint;
 </ul>
 <p>if (!constraint) {<br>        newConstraint.delegate = self;<br>        [self.constraints addObject:newConstraint];<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">* 为`MASViewConstraint`对象设置了代理，（这个代理有什么用，后面具体说的），并把改对象加到了数组中，用于后面的`install`。</div><div class="line">* 最后返回`MASConstraint`对象，为进行后面的配置。返回`MASConstraint`类型对象的原因是为了后面的链式调用。并且刚刚说的设置delegate也是为了链式调用。</div><div class="line"></div><div class="line">## (MASConstraint*).equalTo(@10.0f)</div></pre></td></tr></table></figure></p>
 <ul>
-<li><p>(MASConstraint * (^)(id))equalTo {<br> return ^id(id attribute) {</p>
-<pre><code>return self.equalToWithRelation(attribute, NSLayoutRelationEqual);
+<li>(MASConstraint * (^)(id))equalTo {<br> return ^id(id attribute) {<pre><code>return self.equalToWithRelation(attribute, NSLayoutRelationEqual);
 };
-</code></pre><p>}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">继续点`equalToWithRelation`，选择选项。如果点击`MASConstraint`中的`equalToWithRelation`会执行抛出`MASMethodNotImplemented()`;这个宏。因为`MASConstraint`是抽象类，它不创建对象，只能通过它的子类来执行，就是方法不由`MASConstraint`操作，它的子类来实现方法。我们点进`MASViewConstraint`类中的`equalToWithRelation`方法。方法：</div></pre></td></tr></table></figure>
+</code></pre>}<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">继续点`equalToWithRelation`，选择选项。如果点击`MASConstraint`中的`equalToWithRelation`会执行抛出`MASMethodNotImplemented()`;这个宏。因为`MASConstraint`是抽象类，它不创建对象，只能通过它的子类来执行，就是方法不由`MASConstraint`操作，它的子类来实现方法。我们点进`MASViewConstraint`类中的`equalToWithRelation`方法。方法：</div></pre></td></tr></table></figure>
 </li>
-<li><p>(MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {<br> return ^id(id attribute, NSLayoutRelation relation) {</p>
+</ul>
+<ul>
+<li><p>(MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {<br>  return ^id(id attribute, NSLayoutRelation relation) {</p>
 <pre><code>if ([attribute isKindOfClass:NSArray.class]) {
     NSAssert(!self.hasLayoutRelation, @&quot;Redefinition of constraint relation&quot;);
     NSMutableArray *children = NSMutableArray.new;
     for (id attr in attribute) {
         MASViewConstraint *viewConstraint = [self copy];
+        viewConstraint.layoutRelation = relation;
         viewConstraint.secondViewAttribute = attr;
         [children addObject:viewConstraint];
     }
@@ -439,11 +439,9 @@ return compositeConstraint;
     self.secondViewAttribute = attribute;
     return self;
 }
-</code></pre><p>   };<br>}</p>
+</code></pre><p>  };<br>}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">* `if ([attribute isKindOfClass:NSArray.class]) `在`(MASConstraint*).equalTo(@[view,view])`的时候成立，最后返回的是`MASCompositeConstraint `对象，里面包含了约束数组。并且设置的`delegate`，一样为了链式调用</div><div class="line">* `else`中针对于单个约束操作，两个赋值操作。`self.layoutRelation`和`self.secondViewAttribute`都重写的`set`方法。</div></pre></td></tr></table></figure>
 </li>
-</ul>
-<ul>
 <li><p>(void)setLayoutRelation:(NSLayoutRelation)layoutRelation {<br>  _layoutRelation = layoutRelation;<br>  self.hasLayoutRelation = YES;<br>}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">* 保存了约束关系`NSLayoutRelationEqual`。`hasLayoutRelation`设置`YES`，说明已经有约束关系。</div></pre></td></tr></table></figure>
 </li>
@@ -459,7 +457,7 @@ return compositeConstraint;
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">* 重写`secondViewAttribute`方法。针对于`equalTo(self)`的参数类型做判断。</div><div class="line"></div><div class="line">   第一个是一个`NSValue`类型的。也就是equalTo(@10.0f)。查看调用链。最后得到`_layoutConstant` 和`self.layoutConstraint.constant`最后调用约束`install`时会用到。</div><div class="line">  第二个是一个`view`类型。也就是`equalTo(self)`或者`equalTo(view)`这几种情况。然后会创建一个与`firstViewAttribute`持有相同`layoutAttribute`属性的`MASViewAttribute`的对象。相当于使要约束的对象的`height`于被约束的对象的`height`相等。</div><div class="line">  第三种是`MASViewAttribute`类型，例如：equalTo(self.height)直接复制给`_secondViewAttribute`，跟第二种意思差不多。</div><div class="line"></div><div class="line">`- (void)setLayoutConstantWithValue:(NSValue *)value`方法会判断`Value`类型，这种情况会走到</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>if ([value isKindOfClass:NSNumber.class]) {<br>        self.offset = [(NSNumber *)value doubleValue];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">## make.edges.mas_equalTo(UIEdgeInsetsMake(10.0f, 0, 10.0f, 0));</div><div class="line"></div><div class="line">调用链：</div></pre></td></tr></table></figure></p>
+<p>if ([value isKindOfClass:NSNumber.class]) {<br>        self.offset = [(NSNumber *)value doubleValue];<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">## make.edges.mas_equalTo(UIEdgeInsetsMake(10.0f, 0, 10.0f, 0));</div><div class="line"></div><div class="line">调用链：</div></pre></td></tr></table></figure></p>
 <ul>
 <li><p>(MASConstraint *)edges {<br>  return [self addConstraintWithAttributes:MASAttributeTop | MASAttributeLeft | MASAttributeRight | MASAttributeBottom];<br>}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
@@ -490,20 +488,12 @@ constraint.delegate = self;
 [self.constraints addObject:constraint];
 return constraint;
 </code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">主要是：</div></pre></td></tr></table></figure></p>
-<p> if (attrs &amp; MASAttributeLeft) [attributes addObject:self.view.mas_left];<br>    if (attrs &amp; MASAttributeRight) [attributes addObject:self.view.mas_right];<br>    if (attrs &amp; MASAttributeTop) [attributes addObject:self.view.mas_top];<br>    if (attrs &amp; MASAttributeBottom) [attributes addObject:self.view.mas_bottom];</p>
-<p> NSMutableArray *children = [NSMutableArray arrayWithCapacity:attributes.count];</p>
-<pre><code>for (MASViewAttribute *a in attributes) {
-    [children addObject:[[MASViewConstraint alloc] initWithFirstViewAttribute:a]];
-}
-
-MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChildren:children];
-constraint.delegate = self;
-[self.constraints addObject:constraint];
-return constraint;
-</code></pre> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line"> </div><div class="line">* 根据`edges`加入相关`MASViewAttribute`对象进数组。通过数组中的`MASViewAttribute`对象创建`MASViewConstraint`对象加入数组。再传入该数组创建`MASCompositeConstraint`对象。设置代理，加入`self.constraints`数组待使用。再返回`MASCompositeConstraint`对象。基本步骤跟上面的</div><div class="line">`- (MASConstraint *)constraint:(MASConstraint *)constraint   addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute`差不多。因为`edges`包含了多个约束，所以最后返回的是`MASConstraint`子类`MASCompositeConstraint`。上面介绍过`MASCompositeConstraint`是存放`MASConstraint`对象的一个集合也就是`_childConstraints`这个数组。</div><div class="line"></div><div class="line">&gt;  mas_equalTo只是对其参数进行了一个BOX操作(装箱)，</div><div class="line">  </div><div class="line">    1. #define mas_equalTo(...) equalTo(MASBoxValue((__VA_ARGS__)))</div><div class="line">    2. #define MASBoxValue(value) _MASBoxValue(@encode(__typeof__((value))), (value))</div><div class="line">    3. static inline id _MASBoxValue(const char *type, ...)</div><div class="line">    </div><div class="line">* 所做的事情基本数据类型包装成`NSValue`或者`NSNumber`。</div><div class="line"></div><div class="line">* 所支持的类型 除了NSNumber支持的那些数值类型之外 就只支持`CGPoint`、 `CGSize`、`UIEdgeInsets`。</div><div class="line">`make.height.mas_equalTo(10.0f);` 后面就直接可以写基本数据类型了。而`make.height.equalTo(@10.0f);`需要添加`@`符号，转化成`NSValue`类型。</div><div class="line">最后跟上面的情况不同。上面一种进入的是进去：</div></pre></td></tr></table></figure>
-<p>if ([value isKindOfClass:NSNumber.class])<br>        self.offset = [(NSNumber *)value doubleValue];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">而这个不是`NSNumber`类型。进入的是</div></pre></td></tr></table></figure></p>
-<p>if (strcmp(value.objCType, @encode(MASEdgeInsets)) == 0)<br>        MASEdgeInsets insets;<br>        [value getValue:&amp;insets];<br>        self.insets = insets;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">## make.size.mas_equalTo(CGSizeMake(10.0, 20.0));</div><div class="line">* 具体调用链跟上面一种情况相似。也是最后一步进入的是：</div></pre></td></tr></table></figure></p>
-<p>if (strcmp(value.objCType, @encode(CGSize)) == 0) {<br>        CGSize size;<br>        [value getValue:&amp;size];<br>        self.sizeOffset = size;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## make.left.right.and.bottom.equalTo(superview);</div><div class="line"></div><div class="line">* .left调用链：</div></pre></td></tr></table></figure></p>
+<p>if (attrs &amp; MASAttributeLeft) [attributes addObject:self.view.mas_left];<br>if (attrs &amp; MASAttributeRight) [attributes addObject:self.view.mas_right];<br>if (attrs &amp; MASAttributeTop) [attributes addObject:self.view.mas_top];<br>if (attrs &amp; MASAttributeBottom) [attributes addObject:self.view.mas_bottom];</p>
+<p>NSMutableArray <em>children = [NSMutableArray arrayWithCapacity:attributes.count];<br>for (MASViewAttribute </em>a in attributes) {<br>    [children addObject:[[MASViewConstraint alloc] initWithFirstViewAttribute:a]];<br>}</p>
+<p>MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChildren:children];<br>constraint.delegate = self;<br>[self.constraints addObject:constraint];<br>return constraint;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line"> </div><div class="line">* 根据`edges`加入相关`MASViewAttribute`对象进数组。通过数组中的`MASViewAttribute`对象创建`MASViewConstraint`对象加入数组。再传入该数组创建`MASCompositeConstraint`对象。设置代理，加入`self.constraints`数组待使用。再返回`MASCompositeConstraint`对象。基本步骤跟上面的</div><div class="line">`- (MASConstraint *)constraint:(MASConstraint *)constraint   addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute`差不多。因为`edges`包含了多个约束，所以最后返回的是`MASConstraint`子类`MASCompositeConstraint`。上面介绍过`MASCompositeConstraint`是存放`MASConstraint`对象的一个集合也就是`_childConstraints`这个数组。</div><div class="line"></div><div class="line">&gt;  mas_equalTo只是对其参数进行了一个BOX操作(装箱)，</div><div class="line">  </div><div class="line">    1. #define mas_equalTo(...) equalTo(MASBoxValue((__VA_ARGS__)))</div><div class="line">    2. #define MASBoxValue(value) _MASBoxValue(@encode(__typeof__((value))), (value))</div><div class="line">    3. static inline id _MASBoxValue(const char *type, ...)</div><div class="line">    </div><div class="line">* 所做的事情基本数据类型包装成`NSValue`或者`NSNumber`。</div><div class="line"></div><div class="line">* 所支持的类型 除了NSNumber支持的那些数值类型之外 就只支持`CGPoint`、 `CGSize`、`UIEdgeInsets`。</div><div class="line">`make.height.mas_equalTo(10.0f);` 后面就直接可以写基本数据类型了。而`make.height.equalTo(@10.0f);`需要添加`@`符号，转化成`NSValue`类型。</div><div class="line">最后跟上面的情况不同。上面一种进入的是进去：</div></pre></td></tr></table></figure></p>
+<p>if ([value isKindOfClass:NSNumber.class])<br>    self.offset = [(NSNumber *)value doubleValue];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">而这个不是`NSNumber`类型。进入的是</div></pre></td></tr></table></figure></p>
+<p>if (strcmp(value.objCType, @encode(MASEdgeInsets)) == 0)<br>    MASEdgeInsets insets;<br>    [value getValue:&amp;insets];<br>    self.insets = insets;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">## make.size.mas_equalTo(CGSizeMake(10.0, 20.0));</div><div class="line">* 具体调用链跟上面一种情况相似。也是最后一步进入的是：</div></pre></td></tr></table></figure></p>
+<p>if (strcmp(value.objCType, @encode(CGSize)) == 0) {<br>     GSize size;<br>    [value getValue:&amp;size];<br>    self.sizeOffset = size;<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## make.left.right.and.bottom.equalTo(superview);</div><div class="line"></div><div class="line">* .left调用链：</div></pre></td></tr></table></figure></p>
 <p>MASConstraintMaker.m</p>
 <ul>
 <li>(MASConstraint *)left {<br>  return [self addConstraintWithLayoutAttribute:NSLayoutAttributeLeft];<br>}<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
@@ -690,15 +680,15 @@ return self;
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/09/04/2017-9-4/" rel="next" title="RunTime 方法总结（上）">
+                <i class="fa fa-chevron-left"></i> RunTime 方法总结（上）
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/04/19/2017-3-15/" rel="prev" title="理解Run Loop">
-                理解Run Loop <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
